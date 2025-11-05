@@ -50,15 +50,19 @@
 
           <label for="asunto">Asunto</label>
           <input id="asunto" placeholder="Ej: Reunión informativa" />
-                    <label for="cuerpo">Cuerpo</label>
+
+          <label for="cuerpo">Cuerpo</label>
           <textarea id="cuerpo" placeholder="Escribí el texto aquí..."></textarea>
+
           <label for="firmaNombre">Firma</label>
           <input id="firmaNombre" placeholder="Nombre y Apellido" />
 
           <div class="actions">
             <button id="btn-generar">Generar vista previa</button>
             <button id="btn-copiar-html" class="secondary" disabled>Copiar HTML</button>
+            <button id="btn-copiar-asunto" class="secondary" disabled>Copiar Asunto</button>
           </div>
+          <div class="footer-note">Los PNG deben estar en la <strong>misma carpeta</strong> que este <code>index.html</code>.</div>
         </div>
       </div>
 
@@ -72,9 +76,10 @@
   </div>
 
   <script>
+    // ================== CONFIG ==================
     const SCHOOL_NAME = 'Colegio Guido Spano';
     const BASE_WEBSITE = 'www.colegioguidospano.edu.ar';
-    const ASSETS = ''; // usar rutas relativas (mismos archivos en la raíz del repo)
+    const ASSETS = ''; // usar rutas relativas (archivos en la raíz del repo)
 
     const IMAGES = {
       inicial:   { header: 'header_inicial.png',   footer: 'footer_inicial.png' },
@@ -91,50 +96,157 @@
       superior:  { name: 'Nivel Superior',   color: '#16a34a', dark: '#166534' },
     };
 
-    function sanitize(str){ return (str||'').replace(/[<>]/g, s=>({'<':'&lt;','>':'&gt;'}[s])); }
+    // ================= HELPERS ==================
+    const sanitize = (str) => (str||'').replace(/[<>]/g, s => ({'<':'&lt;','>':'&gt;'}[s]));
+
     function paragraphsFrom(text){
-      const t=(text||'').trim(); if(!t) return '';
-      return t.split(/\n\s*\n|\r\n\r\n|\r\r/).map(b=>`<p style="margin:0 0 12px; line-height:1.6;">${sanitize(b)}</p>`).join('');
+      const t = (text||'').trim(); if(!t) return '';
+      // Separa por bloques de párrafos en blanco y respeta saltos de línea dentro del bloque
+      return t.split(/\n\s*\n|\r\n\r\n|\r\r/).map(block => {
+        const lines = block.split(/\n|\r\n|\r/).map(l=>sanitize(l));
+        return `<p style="margin:0 0 12px; line-height:1.6;">${lines.join('<br/>')}</p>`;
+      }).join('');
     }
-    function imgRow(url,alt){ if(!url) return ''; const u = /^(https?:)?\//.test(url) ? url : (ASSETS + url); return `<tr><td><img src="${u}" alt="${alt||''}" width="680" style="display:block;width:100%;max-width:680px;height:auto;border:0;"/></td></tr>`; }" alt="${alt}" width="680" style="display:block;width:100%;max-width:680px;height:auto;border:0;"/></td></tr>`;
+
+    function imgRow(url, alt, role){
+      // Inserta una fila de imagen (header/footer). role se usa para fallback si falla la carga.
+      if(!url) return '';
+      const u = /^(https?:)?\//.test(url) ? url : (ASSETS + url);
+      const r = role || '';
+      return `<tr><td><img data-role="${r}" src="${u}" alt="${alt||''}" width="680" style="display:block;width:100%;max-width:680px;height:auto;border:0;"/></td></tr>`;
+    }
+
+    function fallbackHeaderHTML(L){
+      return `<tr>
+        <td style="padding:20px 24px; background:${L.color}; color:#0b1220; font-family:Arial,Helvetica,sans-serif;">
+          <div style="font-size:11px; letter-spacing:.6px; text-transform:uppercase; opacity:.9; font-weight:700;">${sanitize(L.name)}</div>
+          <div style="font-size:18px; font-weight:800; line-height:1.2; margin-top:4px;">${sanitize(SCHOOL_NAME)}</div>
+        </td>
+      </tr>`;
+    }
+
+    function fallbackFooterHTML(L){
+      return `<tr>
+        <td style="padding:12px 24px; background:${L.dark}; color:#ecfeff; font-family:Arial,Helvetica,sans-serif; font-size:12px;">
+          <div style="opacity:.95;">${sanitize(SCHOOL_NAME)} – ${sanitize(L.name)}</div>
+          <div style="opacity:.7;">${sanitize(BASE_WEBSITE)}</div>
+        </td>
+      </tr>`;
+    }
+
+    function attachImageFallbacks(container, L){
+      const imgs = container.querySelectorAll('img[data-role]');
+      imgs.forEach(img => {
+        img.addEventListener('error', () => {
+          const role = img.getAttribute('data-role');
+          const td = img.closest('td');
+          if(!td) return;
+          td.innerHTML = role === 'header' ? fallbackHeaderHTML(L) : fallbackFooterHTML(L);
+        }, { once: true });
+      });
     }
 
     function buildEmailHTML({nivel, cuerpo, firmaNombre}){
-      const L = LEVELS[nivel]||LEVELS.primario;
-      const imgs = IMAGES[nivel]||IMAGES.primario;
+      const L = LEVELS[nivel] || LEVELS.primario;
+      const imgs = IMAGES[nivel] || IMAGES.primario;
       return `
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;padding:24px 0;">
   <tr><td align="center">
     <table role="presentation" width="680" cellpadding="0" cellspacing="0" style="max-width:680px;background:#fff;border:1px solid #e5e7eb;">
-      ${imgRow(imgs.header, 'Header '+L.name)}
+      ${imgRow(imgs.header, 'Header ' + L.name, 'header')}
       <tr><td style="padding:20px 24px;font-family:Arial,Helvetica,sans-serif; color:#111827; font-size:14px;">
         ${paragraphsFrom(cuerpo)}
-        ${firmaNombre ? `<p style=\"margin-top:12px;font-weight:700;\">${sanitize(firmaNombre)}</p>` : ''}
+        ${firmaNombre ? `<p style="margin-top:12px;font-weight:700;">${sanitize(firmaNombre)}</p>` : ''}
       </td></tr>
-      ${imgRow(imgs.footer, 'Footer '+L.name)}
-    </table>
-  </td></tr>
-</table>`;
-    }
-      <tr><td style="padding:20px 24px;font-family:Arial,Helvetica,sans-serif;">
-        ${paragraphsFrom(cuerpo)}
-        <p style="margin-top:12px;font-weight:700;">${sanitize(firmaNombre||'')}</p>
-      </td></tr>
-      ${imgRow(imgs.footer, 'Footer '+L.name)}
+      ${imgRow(imgs.footer, 'Footer ' + L.name, 'footer')}
     </table>
   </td></tr>
 </table>`;
     }
 
-    const els={nivel:document.getElementById('nivel'),cuerpo:document.getElementById('cuerpo'),firmaNombre:document.getElementById('firmaNombre'),preview:document.getElementById('preview'),btnGenerar:document.getElementById('btn-generar'),btnCopiar:document.getElementById('btn-copiar-html')};
+    // ================ UI WIRING ================
+    const els = {
+      nivel: document.getElementById('nivel'),
+      asunto: document.getElementById('asunto'),
+      cuerpo: document.getElementById('cuerpo'),
+      firmaNombre: document.getElementById('firmaNombre'),
+      preview: document.getElementById('preview'),
+      btnGenerar: document.getElementById('btn-generar'),
+      btnCopiarHtml: document.getElementById('btn-copiar-html'),
+      btnCopiarAsunto: document.getElementById('btn-copiar-asunto'),
+    };
 
-    function update(){const data={nivel:els.nivel.value,cuerpo:els.cuerpo.value,firmaNombre:els.firmaNombre.value};els.preview.innerHTML=buildEmailHTML(data);els.btnCopiar.disabled=false;};els.preview.innerHTML=buildEmailHTML(data);els.btnCopiar.disabled=false;}
+    function gather(){
+      return {
+        nivel: els.nivel.value,
+        asunto: (els.asunto.value||'').trim(),
+        cuerpo: els.cuerpo.value,
+        firmaNombre: els.firmaNombre.value,
+      };
+    }
 
-    els.btnGenerar.addEventListener('click',update);
-    els.btnCopiar.addEventListener('click',async()=>{await navigator.clipboard.writeText(buildEmailHTML({nivel:els.nivel.value,cuerpo:els.cuerpo.value,firmaNombre:els.firmaNombre.value}));els.btnCopiar.textContent='¡Copiado!';setTimeout(()=>els.btnCopiar.textContent='Copiar HTML',1500);});
-    ['nivel','cuerpo','firmaNombre'].forEach(id=>document.getElementById(id).addEventListener('input',update));
+    function update(){
+      const data = gather();
+      els.preview.innerHTML = buildEmailHTML(data);
+      attachImageFallbacks(els.preview, LEVELS[data.nivel] || LEVELS.primario);
+      els.btnCopiarHtml.disabled = false;
+      els.btnCopiarAsunto.disabled = !data.asunto;
+    }
+
+    async function copyRichHTML(html){
+      try {
+        if (navigator.clipboard && window.ClipboardItem) {
+          const item = new ClipboardItem({
+            'text/html': new Blob([html], {type:'text/html'}),
+            'text/plain': new Blob([html.replace(/<[^>]+>/g,'')], {type:'text/plain'})
+          });
+          await navigator.clipboard.write([item]);
+          return true;
+        } else {
+          // Fallback contentEditable
+          const tmp = document.createElement('div');
+          tmp.contentEditable = 'true';
+          tmp.style.position = 'fixed'; tmp.style.left = '-9999px';
+          document.body.appendChild(tmp);
+          tmp.innerHTML = html;
+          const range = document.createRange(); range.selectNodeContents(tmp);
+          const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+          const ok = document.execCommand('copy');
+          document.body.removeChild(tmp);
+          return ok;
+        }
+      } catch (e) { console.error(e); return false; }
+    }
+
+    els.btnGenerar.addEventListener('click', update);
+    els.btnCopiarHtml.addEventListener('click', async ()=>{
+      const ok = await copyRichHTML(buildEmailHTML(gather()));
+      els.btnCopiarHtml.textContent = ok ? '¡Copiado!' : 'No se pudo copiar :(';
+      setTimeout(()=> els.btnCopiarHtml.textContent = 'Copiar HTML', 1500);
+    });
+    els.btnCopiarAsunto.addEventListener('click', async ()=>{
+      const a = (els.asunto.value||'').trim(); if(!a) return;
+      try{ await navigator.clipboard.writeText(a); els.btnCopiarAsunto.textContent='Asunto copiado'; }catch{ els.btnCopiarAsunto.textContent='No se pudo copiar'; }
+      setTimeout(()=> els.btnCopiarAsunto.textContent='Copiar Asunto', 1400);
+    });
+
+    ['nivel','asunto','cuerpo','firmaNombre'].forEach(id=> document.getElementById(id).addEventListener('input', update));
+
+    // ================ SELF TESTS ================
+    (function selfTests(){
+      const tests = [];
+      const t1 = imgRow('header_primario.png','h','header');
+      tests.push(t1.startsWith('<tr>') && t1.includes('data-role="header"'));
+      const t2 = buildEmailHTML({nivel:'primario', cuerpo:'Linea 1\n\nLinea 2', firmaNombre:'Test'});
+      tests.push(/Footer/.test(t2) && /Header/.test(t2) && /<p/.test(t2));
+      const t3 = paragraphsFrom('a\n\nb');
+      tests.push((t3.match(/<p/g)||[]).length === 2);
+      const allPass = tests.every(Boolean);
+      if(!allPass){ console.error('Self-tests failed', {tests}); }
+    })();
+
+    // Estado inicial
     update();
   </script>
 </body>
 </html>
-
