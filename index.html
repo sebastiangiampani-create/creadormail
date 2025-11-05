@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Generador de mails estandarizados – Nuevo Guido Spano </title>
-  <meta name="description" content="Arma comunicaciones con formato estándar para copiar y pegar en Gmail. " />
+  <title>Generador de mails estandarizados – Guido Spano</title>
+  <meta name="description" content="Arma comunicaciones con formato estándar para copiar y pegar en Gmail. Incluye header/footer por nivel y logo institucional en la página." />
   <style>
     :root { --bg:#0f172a; --panel:#111827; --muted:#64748b; --text:#e5e7eb; --accent:#22c55e; --ring:rgba(34,197,94,.35); }
     html, body {height: 100%;}
@@ -14,7 +14,6 @@
     .card {background: var(--panel); border: 1px solid #1f2937; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.25);}    
     .card h2 {margin: 0 0 16px; font-size: 18px; letter-spacing:.2px}
     .card .content {padding: 20px;}
-    .row {display: grid; grid-template-columns: 1fr 1fr; gap: 12px;}
     label {display: block; font-size: 12px; color: var(--muted); margin: 16px 0 8px;}
     input, select, textarea {width: 100%; box-sizing: border-box; background: #0b1220; color: var(--text); border: 1px solid #233046; border-radius: 12px; padding: 12px 14px; outline: none;}
     input:focus, select:focus, textarea:focus {border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring);}    
@@ -23,7 +22,6 @@
     .actions {display:flex; gap: 10px; flex-wrap: wrap;}
     button {appearance: none; border: 0; border-radius: 12px; background: var(--accent); color: #07130a; font-weight: 700; padding: 12px 16px; cursor: pointer;}
     button.secondary {background: #1f2937; color: #cbd5e1; border: 1px solid #2a3a54;}
-    button.ghost {background: transparent; border: 1px dashed #334155; color: #9ca3af}
     .footer-note {margin-top: 12px; font-size: 12px; color: var(--muted)}
     .preview-wrap {background:#0b1220; border-top: 1px solid #1f2937; padding:16px; border-radius: 0 0 18px 18px}
     .preview {background: white; color: black; max-width: 680px; margin: 0 auto; border: 1px solid #e5e7eb;}
@@ -32,105 +30,60 @@
 </head>
 <body>
   <div class="container">
-    <div class="content">
-      <h1 style="margin:0 0 6px">Generador de mails estandarizados</h1>
-      <div class="muted">Versión con <strong>headers/footers en PNG por nivel</strong> y <strong>logo en firma</strong>. Pensado para copiar/pegar en Gmail.</div>
+    <div class="content" style="text-align:center; margin-bottom:24px;">
+      <img src="logo.jpg" alt="Logo Colegio Guido Spano" style="height:70px; margin-bottom:12px;"/>
+      <h1 style="margin:0">Generador de mails estandarizados</h1>
+      <div class="muted">Versión con header/footer en PNG por nivel y logo institucional en la cabecera.</div>
     </div>
 
     <div class="grid">
-      <!-- FORM -->
       <div class="card">
         <div class="content">
           <h2>1) Completar la comunicación</h2>
-          <div class="row">
-            <div>
-              <label for="nivel">Nivel</label>
-              <select id="nivel">
-                <option value="inicial">Inicial</option>
-                <option value="primario" selected>Primario</option>
-                <option value="secundario">Secundario</option>
-                <option value="superior">Superior</option>
-              </select>
-            </div>
-            <div>
-              <label for="asunto">Asunto (Gmail)</label>
-              <input id="asunto" type="text" placeholder="Ej: Reunión informativa de familias" />
-            </div>
-          </div>
+          <label for="nivel">Nivel</label>
+          <select id="nivel">
+            <option value="inicial">Inicial</option>
+            <option value="primario" selected>Primario</option>
+            <option value="secundario">Secundario</option>
+            <option value="superior">Superior</option>
+          </select>
 
-          <label for="titulo">Título interno (encabezado del mail)</label>
-          <input id="titulo" type="text" placeholder="Ej: Reunión informativa – 3º A" />
+          <label for="asunto">Asunto</label>
+          <input id="asunto" placeholder="Ej: Reunión informativa" />
+                    <label for="cuerpo">Cuerpo</label>
+          <textarea id="cuerpo" placeholder="Escribí el texto aquí..."></textarea>
+          <label for="firmaNombre">Firma</label>
+          <input id="firmaNombre" placeholder="Nombre y Apellido" />
 
-          <label for="cuerpo">Cuerpo del mensaje</label>
-          <textarea id="cuerpo" placeholder="Escribí el texto aquí. Podés usar saltos de línea para separar párrafos."></textarea>
-
-          <div class="row">
-            <div>
-              <label for="despedida">Despedida</label>
-              <input id="despedida" type="text" placeholder="Saludos cordiales," value="Saludos cordiales," />
-            </div>
-            <div>
-              <label for="firmaNombre">Nombre y apellido</label>
-              <input id="firmaNombre" type="text" placeholder="Nombre Apellido" />
-            </div>
-          </div>
-
-          <div class="row">
-            <div>
-              <label for="firmaCargo">Cargo / Sector</label>
-              <input id="firmaCargo" type="text" placeholder="Coordinación – Nivel Primario" />
-            </div>
-            <div>
-              <label for="firmaContacto">Contacto (opcional)</label>
-              <input id="firmaContacto" type="text" placeholder="Tel./correo alternativo" />
-            </div>
-          </div>
-
-          <div style="height:12px"></div>
           <div class="actions">
             <button id="btn-generar">Generar vista previa</button>
-            <button id="btn-copiar-html" class="secondary" title="Copia el contenido para pegar directamente en Gmail" disabled>Copiar contenido para Gmail</button>
-            <button id="btn-copiar-asunto" class="ghost" disabled>Copiar asunto</button>
+            <button id="btn-copiar-html" class="secondary" disabled>Copiar HTML</button>
           </div>
-          <div class="footer-note">Las imágenes deben ser URLs públicas (GitHub Pages). El receptor verá “mostrar imágenes” si su cliente las bloquea por defecto.</div>
         </div>
       </div>
 
-      <!-- PREVIEW -->
       <div class="card">
         <div class="content">
           <h2>2) Vista previa</h2>
-          <div class="muted">El ancho de email se limita a ~680 px. El header/footer PNG se ajusta al ancho.</div>
         </div>
-        <div class="preview-wrap">
-          <div id="preview" class="preview"></div>
-        </div>
+        <div class="preview-wrap"><div id="preview" class="preview"></div></div>
       </div>
     </div>
-
-    <div style="margin-top:18px" class="muted">Código listo para GitHub Pages (archivo único).</div>
   </div>
 
   <script>
-    // ================= CONFIG =================
-    const SCHOOL_NAME = 'Nuevo Guido Spano';
-    const BASE_WEBSITE = 'www.nuevoguidospano.edu.ar';
+    const SCHOOL_NAME = 'Colegio Guido Spano';
+    const BASE_WEBSITE = 'www.colegioguidospano.edu.ar';
+    const ASSETS = ''; // usar rutas relativas (mismos archivos en la raíz del repo)
 
-    // Cambiá esta URL base por la de TU GitHub Pages.
-    // Ejemplo: 'https://tu-usuario.github.io/comunicaciones-gs/'
-    const SITE_BASE = 'https://tu-usuario.github.io/tu-repo/';
-    const ASSETS = SITE_BASE.replace(/\/$/, '') + '/'; // archivos en la raíz del repo (branch main)
-
-    // Nombres de archivos PNG por nivel (editá cuando nos pases los nombres reales)
     const IMAGES = {
       inicial:   { header: 'header_inicial.png',   footer: 'footer_inicial.png' },
       primario:  { header: 'header_primario.png',  footer: 'footer_primaria.png' },
       secundario:{ header: 'header_secundaria.png', footer: 'footer_secu.png' },
       superior:  { header: 'header_sup.png',       footer: 'footer_sup.png' },
-      logos:     { main: 'logo.jpg', }
+      logos:     { main: 'logo.jpg' }
     };
 
-    // Colores de fallback si falta alguna imagen
     const LEVELS = {
       inicial:   { name: 'Nivel Inicial',    color: '#ffb703', dark: '#b7791f' },
       primario:  { name: 'Nivel Primario',   color: '#219ebc', dark: '#0e7490' },
@@ -138,170 +91,49 @@
       superior:  { name: 'Nivel Superior',   color: '#16a34a', dark: '#166534' },
     };
 
-    // ================ HELPERS =================
-    const sanitize = (str) => (str || '').replace(/[<>]/g, s => ({'<':'&lt;','>':'&gt;'}[s]));
+    function sanitize(str){ return (str||'').replace(/[<>]/g, s=>({'<':'&lt;','>':'&gt;'}[s])); }
     function paragraphsFrom(text){
-      const t = (text||'').trim();
-      if(!t) return '';
-      return t.split(/\n\s*\n|\r\n\r\n|\r\r/).map(block => {
-        const lines = block.split(/\n|\r\n|\r/).map(l=>sanitize(l));
-        return `<p style="Margin:0 0 12px 0; line-height:1.6;">${lines.join('<br/>')}</p>`;
-      }).join('\n');
+      const t=(text||'').trim(); if(!t) return '';
+      return t.split(/\n\s*\n|\r\n\r\n|\r\r/).map(b=>`<p style="margin:0 0 12px; line-height:1.6;">${sanitize(b)}</p>`).join('');
+    }
+    function imgRow(url,alt){ if(!url) return ''; const u = /^(https?:)?\//.test(url) ? url : (ASSETS + url); return `<tr><td><img src="${u}" alt="${alt||''}" width="680" style="display:block;width:100%;max-width:680px;height:auto;border:0;"/></td></tr>`; }" alt="${alt}" width="680" style="display:block;width:100%;max-width:680px;height:auto;border:0;"/></td></tr>`;
     }
 
-    function imgRow(url, alt){
-      if(!url) return '';
-      const u = url.startsWith('http') ? url : (ASSETS + url);
+    function buildEmailHTML({nivel, cuerpo, firmaNombre}){
+      const L = LEVELS[nivel]||LEVELS.primario;
+      const imgs = IMAGES[nivel]||IMAGES.primario;
       return `
-        <tr>
-          <td style="padding:0;">
-            <img src="${u}" alt="${sanitize(alt||'')}" width="680" style="display:block; width:100%; max-width:680px; height:auto; border:0; outline:none; text-decoration:none;" />
-          </td>
-        </tr>`;
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;padding:24px 0;">
+  <tr><td align="center">
+    <table role="presentation" width="680" cellpadding="0" cellspacing="0" style="max-width:680px;background:#fff;border:1px solid #e5e7eb;">
+      ${imgRow(imgs.header, 'Header '+L.name)}
+      <tr><td style="padding:20px 24px;font-family:Arial,Helvetica,sans-serif; color:#111827; font-size:14px;">
+        ${paragraphsFrom(cuerpo)}
+        ${firmaNombre ? `<p style=\"margin-top:12px;font-weight:700;\">${sanitize(firmaNombre)}</p>` : ''}
+      </td></tr>
+      ${imgRow(imgs.footer, 'Footer '+L.name)}
+    </table>
+  </td></tr>
+</table>`;
     }
-
-    function signatureBlock({despedida, firmaNombre, firmaCargo, firmaContacto, logoFirmaUrl}){
-      const logo = logoFirmaUrl ? (logoFirmaUrl.startsWith('http') ? logoFirmaUrl : (ASSETS + logoFirmaUrl)) : '';
-      return `
-      ${despedida ? `<p style="Margin:0 0 10px 0; line-height:1.6;">${sanitize(despedida)}</p>` : ''}
-      <table role="presentation" cellpadding="0" cellspacing="0" style="font-family:Arial,Helvetica,sans-serif; font-size:13px; color:#111827;">
-        <tr>
-          ${logo ? `<td valign="top" style="padding:0 10px 0 0;"><img src="${logo}" alt="Logo" width="44" style="display:block; width:44px; height:auto; border:0;"/></td>`:''}
-          <td valign="top" style="padding:0;">
-            ${firmaNombre ? `<div style="font-weight:700; padding:0 0 2px 0;">${sanitize(firmaNombre)}</div>`:''}
-            ${firmaCargo ? `<div style="padding:0 0 2px 0; color:#374151;">${sanitize(firmaCargo)}</div>`:''}
-            ${firmaContacto ? `<div style="padding:0; color:#374151;">${sanitize(firmaContacto)}</div>`:''}
-          </td>
-        </tr>
-      </table>`;
-    }
-
-    function buildEmailHTML({nivel, asunto, titulo, cuerpo, despedida, firmaNombre, firmaCargo, firmaContacto}){
-      const L = LEVELS[nivel] || LEVELS.primario;
-      const imgs = IMAGES[nivel] || IMAGES.primario;
-      const heading = sanitize(titulo || '');
-
-      return `
-<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f4f6f8; padding:24px 0;">
-  <tr>
-    <td align="center">
-      <table role="presentation" cellpadding="0" cellspacing="0" width="680" style="max-width:680px; background:#ffffff; border:1px solid #e5e7eb;">
-        ${imgRow(imgs.header, SCHOOL_NAME + ' – Header ' + (L.name||'')) || `
-          <tr>
-            <td style="padding:20px 24px; background:${L.color}; color:#0b1220; font-family:Arial,Helvetica,sans-serif;">
-              <div style="font-size:11px; letter-spacing:.6px; text-transform:uppercase; opacity:.9; font-weight:700;">${sanitize(L.name)}</div>
-              <div style="font-size:18px; font-weight:800; line-height:1.2; margin-top:4px;">${sanitize(SCHOOL_NAME)}</div>
-            </td>
-          </tr>`}
-
-        <tr>
-          <td style="padding:20px 24px 8px 24px; font-family:Arial,Helvetica,sans-serif;">
-            <div style="font-size:20px; font-weight:bold; color:#111827;">${heading}</div>
-          </td>
-        </tr>
-
-        <tr>
-          <td style="padding:0 24px 12px 24px; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#111827;">${paragraphsFrom(cuerpo)}</td>
-        </tr>
-
-        <tr>
-          <td style="padding:0 24px 20px 24px; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#111827;">
-            ${signatureBlock({despedida, firmaNombre, firmaCargo, firmaContacto, logoFirmaUrl: IMAGES.logos.firma})}
-          </td>
-        </tr>
-
-        ${imgRow(imgs.footer, SCHOOL_NAME + ' – Footer ' + (L.name||'')) || `
-          <tr>
-            <td style="padding:12px 24px; background:${L.dark}; color:#ecfeff; font-family:Arial,Helvetica,sans-serif; font-size:12px;">
-              <div style="opacity:.95;">${sanitize(SCHOOL_NAME)} – ${sanitize(L.name)}</div>
-              <div style="opacity:.7;">${sanitize(BASE_WEBSITE)}</div>
-            </td>
-          </tr>`}
-      </table>
-    </td>
-  </tr>
+      <tr><td style="padding:20px 24px;font-family:Arial,Helvetica,sans-serif;">
+        ${paragraphsFrom(cuerpo)}
+        <p style="margin-top:12px;font-weight:700;">${sanitize(firmaNombre||'')}</p>
+      </td></tr>
+      ${imgRow(imgs.footer, 'Footer '+L.name)}
+    </table>
+  </td></tr>
 </table>`;
     }
 
-    // ================= UI =================
-    const els = {
-      nivel: document.getElementById('nivel'),
-      asunto: document.getElementById('asunto'),
-      titulo: document.getElementById('titulo'),
-      cuerpo: document.getElementById('cuerpo'),
-      despedida: document.getElementById('despedida'),
-      firmaNombre: document.getElementById('firmaNombre'),
-      firmaCargo: document.getElementById('firmaCargo'),
-      firmaContacto: document.getElementById('firmaContacto'),
-      preview: document.getElementById('preview'),
-      btnGenerar: document.getElementById('btn-generar'),
-      btnCopiarHtml: document.getElementById('btn-copiar-html'),
-      btnCopiarAsunto: document.getElementById('btn-copiar-asunto'),
-    };
+    const els={nivel:document.getElementById('nivel'),cuerpo:document.getElementById('cuerpo'),firmaNombre:document.getElementById('firmaNombre'),preview:document.getElementById('preview'),btnGenerar:document.getElementById('btn-generar'),btnCopiar:document.getElementById('btn-copiar-html')};
 
-    function gather(){
-      return {
-        nivel: els.nivel.value,
-        asunto: els.asunto.value.trim(),
-        titulo: els.titulo.value,
-        cuerpo: els.cuerpo.value,
-        despedida: els.despedida.value,
-        firmaNombre: els.firmaNombre.value,
-        firmaCargo: els.firmaCargo.value,
-        firmaContacto: els.firmaContacto.value,
-      }
-    }
+    function update(){const data={nivel:els.nivel.value,cuerpo:els.cuerpo.value,firmaNombre:els.firmaNombre.value};els.preview.innerHTML=buildEmailHTML(data);els.btnCopiar.disabled=false;};els.preview.innerHTML=buildEmailHTML(data);els.btnCopiar.disabled=false;}
 
-    function updatePreview(){
-      const data = gather();
-      const html = buildEmailHTML(data);
-      els.preview.innerHTML = html;
-      els.btnCopiarHtml.disabled = false;
-      els.btnCopiarAsunto.disabled = !data.asunto;
-    }
-
-    async function copyRichHTML(html){
-      try {
-        if (navigator.clipboard && window.ClipboardItem) {
-          const blob = new Blob([html], {type: 'text/html'});
-          const item = new ClipboardItem({'text/html': blob, 'text/plain': new Blob([html.replace(/<[^>]+>/g,'')], {type:'text/plain'})});
-          await navigator.clipboard.write([item]);
-          return true;
-        } else {
-          const tmp = document.createElement('div');
-          tmp.contentEditable = 'true';
-          tmp.style.position = 'fixed'; tmp.style.left = '-9999px';
-          document.body.appendChild(tmp);
-          tmp.innerHTML = html;
-          const range = document.createRange();
-          range.selectNodeContents(tmp);
-          const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
-          const ok = document.execCommand('copy');
-          document.body.removeChild(tmp);
-          return ok;
-        }
-      } catch (e) { console.error(e); return false; }
-    }
-
-    els.btnGenerar.addEventListener('click', (e)=>{ e.preventDefault(); updatePreview(); });
-    els.btnCopiarHtml.addEventListener('click', async (e)=>{
-      e.preventDefault();
-      const ok = await copyRichHTML(buildEmailHTML(gather()));
-      e.target.textContent = ok ? '¡Copiado!' : 'No se pudo copiar :(';
-      setTimeout(()=>{ e.target.textContent = 'Copiar contenido para Gmail'; }, 1500);
-    });
-    els.btnCopiarAsunto.addEventListener('click', async (e)=>{
-      e.preventDefault();
-      const asunto = els.asunto.value.trim(); if(!asunto) return;
-      try{ await navigator.clipboard.writeText(asunto); e.target.textContent = 'Asunto copiado'; }catch{ e.target.textContent = 'No se pudo copiar'; }
-      setTimeout(()=>{ e.target.textContent = 'Copiar asunto'; }, 1500);
-    });
-
-    ['nivel','asunto','titulo','cuerpo','despedida','firmaNombre','firmaCargo','firmaContacto'].forEach(id=>{
-      document.getElementById(id).addEventListener('input', updatePreview);
-    });
-
-    updatePreview();
+    els.btnGenerar.addEventListener('click',update);
+    els.btnCopiar.addEventListener('click',async()=>{await navigator.clipboard.writeText(buildEmailHTML({nivel:els.nivel.value,cuerpo:els.cuerpo.value,firmaNombre:els.firmaNombre.value}));els.btnCopiar.textContent='¡Copiado!';setTimeout(()=>els.btnCopiar.textContent='Copiar HTML',1500);});
+    ['nivel','cuerpo','firmaNombre'].forEach(id=>document.getElementById(id).addEventListener('input',update));
+    update();
   </script>
 </body>
 </html>
