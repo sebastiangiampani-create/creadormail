@@ -3,17 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Generador de mails estandarizados – Guido Spano</title>
-  <meta name="description" content="Arma comunicaciones con formato estándar para copiar y pegar en Gmail." />
+  <title>Generador de mails estandarizados – Guido Spano (PNG headers/footers)</title>
+  <meta name="description" content="Arma comunicaciones con formato estándar para copiar y pegar en Gmail. Soporta headers/footers como imágenes PNG por nivel y logo en firma." />
   <style>
-    :root {
-      --bg: #0f172a; /* slate-900 */
-      --panel: #111827; /* gray-900 */
-      --muted: #64748b; /* slate-500 */
-      --text: #e5e7eb; /* gray-200 */
-      --accent: #22c55e; /* green-500 */
-      --ring: rgba(34,197,94,.35);
-    }
+    :root { --bg:#0f172a; --panel:#111827; --muted:#64748b; --text:#e5e7eb; --accent:#22c55e; --ring:rgba(34,197,94,.35); }
     html, body {height: 100%;}
     body {margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji'; background: linear-gradient(180deg, #0b1220, #0f172a 20%, #0b1220); color: var(--text);}    
     .container {max-width: 1100px; margin: 32px auto; padding: 0 16px;}
@@ -22,7 +15,6 @@
     .card h2 {margin: 0 0 16px; font-size: 18px; letter-spacing:.2px}
     .card .content {padding: 20px;}
     .row {display: grid; grid-template-columns: 1fr 1fr; gap: 12px;}
-    .row-3 {display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;}
     label {display: block; font-size: 12px; color: var(--muted); margin: 16px 0 8px;}
     input, select, textarea {width: 100%; box-sizing: border-box; background: #0b1220; color: var(--text); border: 1px solid #233046; border-radius: 12px; padding: 12px 14px; outline: none;}
     input:focus, select:focus, textarea:focus {border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring);}    
@@ -32,41 +24,24 @@
     button {appearance: none; border: 0; border-radius: 12px; background: var(--accent); color: #07130a; font-weight: 700; padding: 12px 16px; cursor: pointer;}
     button.secondary {background: #1f2937; color: #cbd5e1; border: 1px solid #2a3a54;}
     button.ghost {background: transparent; border: 1px dashed #334155; color: #9ca3af}
-    .pill {display:inline-flex; align-items:center; gap:8px; font-size:12px; padding:6px 10px; background:#0b1220; border:1px solid #233046; border-radius:999px}
     .footer-note {margin-top: 12px; font-size: 12px; color: var(--muted)}
     .preview-wrap {background:#0b1220; border-top: 1px solid #1f2937; padding:16px; border-radius: 0 0 18px 18px}
     .preview {background: white; color: black; max-width: 680px; margin: 0 auto; border: 1px solid #e5e7eb;}
-    .tiny {font-size: 11px}
-    .badge {font-size:11px; padding:4px 8px; border-radius:8px; border:1px solid #334155; color:#cbd5e1}
-    .stack {display:flex; gap:8px; align-items:center; flex-wrap: wrap}
-    .header {display:flex; justify-content: space-between; align-items: center; margin-bottom: 16px}
-    .brand {display:flex; align-items:center; gap:10px}
-    .brand h1 {font-size: 18px; margin: 0}
-    .logo {width:32px;height:32px;border-radius:10px; background: linear-gradient(135deg, #22c55e, #16a34a)}
-    .help {font-size:12px; color:#93c5fd}
     @media (max-width: 980px){ .grid{grid-template-columns: 1fr;} }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
-        <h1>Generador de mails estandarizados</h1>
-      </div>
-      <div class="stack">
-        <span class="badge">Uso interno – Colegio Guido Spano</span>
-        <a class="help" href="#" onclick="alert('Pega el contenido copiado directamente en el redactor de Gmail (Ctrl/Cmd+V). Si notas pérdidas de formato, usa el menú de tres puntos \'Pegar con formato\'.'); return false;">¿Cómo pegar en Gmail?</a>
-      </div>
+    <div class="content">
+      <h1 style="margin:0 0 6px">Generador de mails estandarizados</h1>
+      <div class="muted">Versión con <strong>headers/footers en PNG por nivel</strong> y <strong>logo en firma</strong>. Pensado para copiar/pegar en Gmail.</div>
     </div>
 
     <div class="grid">
-
       <!-- FORM -->
       <div class="card">
         <div class="content">
           <h2>1) Completar la comunicación</h2>
-
           <div class="row">
             <div>
               <label for="nivel">Nivel</label>
@@ -74,6 +49,7 @@
                 <option value="inicial">Inicial</option>
                 <option value="primario" selected>Primario</option>
                 <option value="secundario">Secundario</option>
+                <option value="superior">Superior</option>
               </select>
             </div>
             <div>
@@ -87,7 +63,6 @@
 
           <label for="cuerpo">Cuerpo del mensaje</label>
           <textarea id="cuerpo" placeholder="Escribí el texto aquí. Podés usar saltos de línea para separar párrafos."></textarea>
-          <div class="muted">Tip: pegá texto sin formato para evitar estilos raros.</div>
 
           <div class="row">
             <div>
@@ -117,7 +92,7 @@
             <button id="btn-copiar-html" class="secondary" title="Copia el contenido para pegar directamente en Gmail" disabled>Copiar contenido para Gmail</button>
             <button id="btn-copiar-asunto" class="ghost" disabled>Copiar asunto</button>
           </div>
-          <div class="footer-note">El botón “Copiar contenido para Gmail” usa el portapapeles en formato <span class="pill">HTML</span> para preservar estilos. Navegadores modernos lo soportan.</div>
+          <div class="footer-note">Las imágenes deben ser URLs públicas (GitHub Pages). El receptor verá “mostrar imágenes” si su cliente las bloquea por defecto.</div>
         </div>
       </div>
 
@@ -125,30 +100,45 @@
       <div class="card">
         <div class="content">
           <h2>2) Vista previa</h2>
-          <div class="muted">Así se verá en la casilla de quien reciba tu mail. El ancho está limitado a 680 px.</div>
+          <div class="muted">El ancho de email se limita a ~680 px. El header/footer PNG se ajusta al ancho.</div>
         </div>
         <div class="preview-wrap">
           <div id="preview" class="preview"></div>
         </div>
       </div>
-
     </div>
 
-    <div style="margin-top:18px" class="muted tiny">Hecho con ❤️ para agilizar la comunicación institucional. Código listo para GitHub Pages (archivo único).</div>
+    <div style="margin-top:18px" class="muted">Código listo para GitHub Pages (archivo único).</div>
   </div>
 
   <script>
-    // === Configuración de identidad y colores por nivel ===
+    // ================= CONFIG =================
     const SCHOOL_NAME = 'Colegio Guido Spano';
-    const BASE_WEBSITE = 'www.colegioguidospano.edu.ar'; // si tienen sitio, editar
+    const BASE_WEBSITE = 'www.colegioguidospano.edu.ar';
 
+    // Cambiá esta URL base por la de TU GitHub Pages.
+    // Ejemplo: 'https://tu-usuario.github.io/comunicaciones-gs/'
+    const SITE_BASE = 'https://tu-usuario.github.io/tu-repo/';
+    const ASSETS = SITE_BASE.replace(/\/$/, '') + '/'; // archivos en la raíz del repo (branch main)
+
+    // Nombres de archivos PNG por nivel (editá cuando nos pases los nombres reales)
+    const IMAGES = {
+      inicial:   { header: 'header_inicial.png',   footer: 'footer_inicial.png' },
+      primario:  { header: 'header_primario.png',  footer: 'footer_primaria.png' },
+      secundario:{ header: 'header_secundaria.png', footer: 'footer_secu.png' },
+      superior:  { header: 'header_sup.png',       footer: 'footer_sup.png' },
+      logos:     { main: 'logo.jpg', firma: 'logo.jpg' }
+    };
+
+    // Colores de fallback si falta alguna imagen
     const LEVELS = {
       inicial:   { name: 'Nivel Inicial',    color: '#ffb703', dark: '#b7791f' },
       primario:  { name: 'Nivel Primario',   color: '#219ebc', dark: '#0e7490' },
       secundario:{ name: 'Nivel Secundario', color: '#8e44ad', dark: '#6b21a8' },
+      superior:  { name: 'Nivel Superior',   color: '#16a34a', dark: '#166534' },
     };
 
-    // === Helpers ===
+    // ================ HELPERS =================
     const sanitize = (str) => (str || '').replace(/[<>]/g, s => ({'<':'&lt;','>':'&gt;'}[s]));
     function paragraphsFrom(text){
       const t = (text||'').trim();
@@ -159,64 +149,81 @@
       }).join('\n');
     }
 
+    function imgRow(url, alt){
+      if(!url) return '';
+      const u = url.startsWith('http') ? url : (ASSETS + url);
+      return `
+        <tr>
+          <td style="padding:0;">
+            <img src="${u}" alt="${sanitize(alt||'')}" width="680" style="display:block; width:100%; max-width:680px; height:auto; border:0; outline:none; text-decoration:none;" />
+          </td>
+        </tr>`;
+    }
+
+    function signatureBlock({despedida, firmaNombre, firmaCargo, firmaContacto, logoFirmaUrl}){
+      const logo = logoFirmaUrl ? (logoFirmaUrl.startsWith('http') ? logoFirmaUrl : (ASSETS + logoFirmaUrl)) : '';
+      return `
+      ${despedida ? `<p style="Margin:0 0 10px 0; line-height:1.6;">${sanitize(despedida)}</p>` : ''}
+      <table role="presentation" cellpadding="0" cellspacing="0" style="font-family:Arial,Helvetica,sans-serif; font-size:13px; color:#111827;">
+        <tr>
+          ${logo ? `<td valign="top" style="padding:0 10px 0 0;"><img src="${logo}" alt="Logo" width="44" style="display:block; width:44px; height:auto; border:0;"/></td>`:''}
+          <td valign="top" style="padding:0;">
+            ${firmaNombre ? `<div style="font-weight:700; padding:0 0 2px 0;">${sanitize(firmaNombre)}</div>`:''}
+            ${firmaCargo ? `<div style="padding:0 0 2px 0; color:#374151;">${sanitize(firmaCargo)}</div>`:''}
+            ${firmaContacto ? `<div style="padding:0; color:#374151;">${sanitize(firmaContacto)}</div>`:''}
+          </td>
+        </tr>
+      </table>`;
+    }
+
     function buildEmailHTML({nivel, asunto, titulo, cuerpo, despedida, firmaNombre, firmaCargo, firmaContacto}){
       const L = LEVELS[nivel] || LEVELS.primario;
-      const color = L.color;
-      const dark = L.dark;
+      const imgs = IMAGES[nivel] || IMAGES.primario;
       const heading = sanitize(titulo || 'Comunicación institucional');
 
-      // Email 600-680px, tablas y estilos en línea, fuentes seguras
       return `
-<!— START: GMAIL-FRIENDLY HTML —>
 <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f4f6f8; padding:24px 0;">
   <tr>
     <td align="center">
       <table role="presentation" cellpadding="0" cellspacing="0" width="680" style="max-width:680px; background:#ffffff; border:1px solid #e5e7eb;">
-        <!-- Header -->
-        <tr>
-          <td style="padding:20px 24px; background:${color}; color:#0b1220; font-family:Arial,Helvetica,sans-serif;">
-            <div style="font-size:11px; letter-spacing:.6px; text-transform:uppercase; opacity:.9; font-weight:700;">${sanitize(L.name)}</div>
-            <div style="font-size:18px; font-weight:800; line-height:1.2; margin-top:4px;">${sanitize(SCHOOL_NAME)}</div>
-          </td>
-        </tr>
-        <!-- Title -->
+        ${imgRow(imgs.header, SCHOOL_NAME + ' – Header ' + (L.name||'')) || `
+          <tr>
+            <td style="padding:20px 24px; background:${L.color}; color:#0b1220; font-family:Arial,Helvetica,sans-serif;">
+              <div style="font-size:11px; letter-spacing:.6px; text-transform:uppercase; opacity:.9; font-weight:700;">${sanitize(L.name)}</div>
+              <div style="font-size:18px; font-weight:800; line-height:1.2; margin-top:4px;">${sanitize(SCHOOL_NAME)}</div>
+            </td>
+          </tr>`}
+
         <tr>
           <td style="padding:20px 24px 8px 24px; font-family:Arial,Helvetica,sans-serif;">
             <div style="font-size:20px; font-weight:bold; color:#111827;">${heading}</div>
           </td>
         </tr>
-        <!-- Body -->
+
         <tr>
           <td style="padding:0 24px 12px 24px; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#111827;">${paragraphsFrom(cuerpo)}</td>
         </tr>
-        <!-- Signature -->
+
         <tr>
           <td style="padding:0 24px 20px 24px; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#111827;">
-            ${despedida ? `<p style="Margin:0 0 10px 0; line-height:1.6;">${sanitize(despedida)}</p>` : ''}
-            ${(firmaNombre||firmaCargo||firmaContacto) ? `
-              <table role="presentation" cellpadding="0" cellspacing="0" style="font-size:13px; color:#111827;">
-                <tr><td style="font-weight:700; padding:0 0 2px 0;">${sanitize(firmaNombre||'')}</td></tr>
-                ${firmaCargo ? `<tr><td style=\"padding:0 0 2px 0; color:#374151\">${sanitize(firmaCargo)}</td></tr>`:''}
-                ${firmaContacto ? `<tr><td style=\"padding:0 0 0 0; color:#374151\">${sanitize(firmaContacto)}</td></tr>`:''}
-              </table>` : ''}
+            ${signatureBlock({despedida, firmaNombre, firmaCargo, firmaContacto, logoFirmaUrl: IMAGES.logos.firma})}
           </td>
         </tr>
-        <!-- Footer -->
-        <tr>
-          <td style="padding:12px 24px; background:${dark}; color:#ecfeff; font-family:Arial,Helvetica,sans-serif; font-size:12px;">
-            <div style="opacity:.95;">${sanitize(SCHOOL_NAME)} – ${sanitize(L.name)}</div>
-            <div style="opacity:.7;">${sanitize(BASE_WEBSITE)}</div>
-          </td>
-        </tr>
+
+        ${imgRow(imgs.footer, SCHOOL_NAME + ' – Footer ' + (L.name||'')) || `
+          <tr>
+            <td style="padding:12px 24px; background:${L.dark}; color:#ecfeff; font-family:Arial,Helvetica,sans-serif; font-size:12px;">
+              <div style="opacity:.95;">${sanitize(SCHOOL_NAME)} – ${sanitize(L.name)}</div>
+              <div style="opacity:.7;">${sanitize(BASE_WEBSITE)}</div>
+            </td>
+          </tr>`}
       </table>
     </td>
   </tr>
-</table>
-<!— END: GMAIL-FRIENDLY HTML —>
-      `.trim();
+</table>`;
     }
 
-    // === UI wiring ===
+    // ================= UI =================
     const els = {
       nivel: document.getElementById('nivel'),
       asunto: document.getElementById('asunto'),
@@ -248,7 +255,7 @@
     function updatePreview(){
       const data = gather();
       const html = buildEmailHTML(data);
-      els.preview.innerHTML = html; // render
+      els.preview.innerHTML = html;
       els.btnCopiarHtml.disabled = false;
       els.btnCopiarAsunto.disabled = !data.asunto;
     }
@@ -261,51 +268,41 @@
           await navigator.clipboard.write([item]);
           return true;
         } else {
-          // Fallback: contentEditable container
           const tmp = document.createElement('div');
           tmp.contentEditable = 'true';
-          tmp.style.position = 'fixed';
-          tmp.style.left = '-9999px';
+          tmp.style.position = 'fixed'; tmp.style.left = '-9999px';
           document.body.appendChild(tmp);
           tmp.innerHTML = html;
           const range = document.createRange();
           range.selectNodeContents(tmp);
-          const sel = window.getSelection();
-          sel.removeAllRanges();
-          sel.addRange(range);
+          const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
           const ok = document.execCommand('copy');
           document.body.removeChild(tmp);
           return ok;
         }
-      } catch (e) {
-        console.error(e);
-        return false;
-      }
+      } catch (e) { console.error(e); return false; }
     }
 
     els.btnGenerar.addEventListener('click', (e)=>{ e.preventDefault(); updatePreview(); });
     els.btnCopiarHtml.addEventListener('click', async (e)=>{
       e.preventDefault();
-      const html = buildEmailHTML(gather());
-      const ok = await copyRichHTML(html);
+      const ok = await copyRichHTML(buildEmailHTML(gather()));
       e.target.textContent = ok ? '¡Copiado!' : 'No se pudo copiar :(';
       setTimeout(()=>{ e.target.textContent = 'Copiar contenido para Gmail'; }, 1500);
     });
     els.btnCopiarAsunto.addEventListener('click', async (e)=>{
       e.preventDefault();
-      const asunto = els.asunto.value.trim();
-      if(!asunto) return;
+      const asunto = els.asunto.value.trim(); if(!asunto) return;
       try{ await navigator.clipboard.writeText(asunto); e.target.textContent = 'Asunto copiado'; }catch{ e.target.textContent = 'No se pudo copiar'; }
       setTimeout(()=>{ e.target.textContent = 'Copiar asunto'; }, 1500);
     });
 
-    // Autogenerar preview al teclear
     ['nivel','asunto','titulo','cuerpo','despedida','firmaNombre','firmaCargo','firmaContacto'].forEach(id=>{
-      document.getElementById(id).addEventListener('input', ()=>{ updatePreview(); });
+      document.getElementById(id).addEventListener('input', updatePreview);
     });
 
-    // Estado inicial
     updatePreview();
   </script>
 </body>
 </html>
+
