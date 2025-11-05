@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Generador de mails estandarizados – Nuevo Guido Spano</title>
+  <title>Generador de mails estandarizados – Guido Spano</title>
   <meta name="description" content="Arma comunicaciones con formato estándar para copiar y pegar en Gmail. Incluye header/footer por nivel y logo institucional en la página." />
   <style>
     :root { --bg:#0f172a; --panel:#111827; --muted:#64748b; --text:#e5e7eb; --accent:#22c55e; --ring:rgba(34,197,94,.35); }
@@ -48,6 +48,10 @@
             <option value="superior">Superior</option>
           </select>
 
+          <label style="display:flex;align-items:center;gap:8px;margin-top:12px;">
+            <input id="ancho-completo" type="checkbox" /> Usar ancho completo (llenar el espacio)
+          </label>
+
           <label for="asunto">Asunto</label>
           <input id="asunto" placeholder="Ej: Reunión informativa" />
 
@@ -77,8 +81,8 @@
 
   <script>
     // ================== CONFIG ==================
-    const SCHOOL_NAME = 'Nuevo Guido Spano';
-    const BASE_WEBSITE = 'www.nuevoguidospano.edu.ar';
+    const SCHOOL_NAME = 'Colegio Guido Spano';
+    const BASE_WEBSITE = 'www.colegioguidospano.edu.ar';
     const ASSETS = ''; // usar rutas relativas (archivos en la raíz del repo)
 
     const IMAGES = {
@@ -146,13 +150,13 @@
       });
     }
 
-    function buildEmailHTML({nivel, cuerpo, firmaNombre}){
+    function buildEmailHTML({nivel, cuerpo, firmaNombre, fullWidth}){
       const L = LEVELS[nivel] || LEVELS.primario;
       const imgs = IMAGES[nivel] || IMAGES.primario;
       return `
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;padding:24px 0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${fullWidth ? '#ffffff' : '#f4f6f8'};${fullWidth ? 'padding:0;' : 'padding:24px 0;'}">
   <tr><td align="center">
-    <table role="presentation" width="680" cellpadding="0" cellspacing="0" style="max-width:680px;background:#fff;border:1px solid #e5e7eb;">
+    <table role="presentation" width="${fullWidth ? '100%' : '680'}" cellpadding="0" cellspacing="0" style="${fullWidth ? '' : 'max-width:680px;'}background:#fff;${fullWidth ? '' : 'border:1px solid #e5e7eb;'}">
       ${imgRow(imgs.header, 'Header ' + L.name, 'header')}
       <tr><td style="padding:20px 24px;font-family:Arial,Helvetica,sans-serif; color:#111827; font-size:14px;">
         ${paragraphsFrom(cuerpo)}
@@ -182,7 +186,9 @@
         asunto: (els.asunto.value||'').trim(),
         cuerpo: els.cuerpo.value,
         firmaNombre: els.firmaNombre.value,
+        fullWidth: !!document.getElementById('ancho-completo').checked,
       };
+    };
     }
 
     function update(){
@@ -221,6 +227,9 @@
     els.btnGenerar.addEventListener('click', update);
     els.btnCopiarHtml.addEventListener('click', async ()=>{
       const ok = await copyRichHTML(buildEmailHTML(gather()));
+      els.btnCopiarHtml.textContent = ok ? '¡Copiado!' : 'No se pudo copiar :(';
+      setTimeout(()=> els.btnCopiarHtml.textContent = 'Copiar HTML', 1500);
+    });
       els.btnCopiarHtml.textContent = ok ? '¡Copiado!' : 'No se pudo copiar :(';
       setTimeout(()=> els.btnCopiarHtml.textContent = 'Copiar HTML', 1500);
     });
