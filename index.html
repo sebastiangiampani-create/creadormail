@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Generador de mails estandarizados – Nuevo Guido Spano </title>
-  <meta name="description" content="Arma comunicaciones con formato estándar para copiar y pegar en Gmail. Soporta headers/footers como imágenes PNG por nivel y logo en firma." />
+  <meta name="description" content="Arma comunicaciones con formato estándar para copiar y pegar en Gmail. " />
   <style>
     :root { --bg:#0f172a; --panel:#111827; --muted:#64748b; --text:#e5e7eb; --accent:#22c55e; --ring:rgba(34,197,94,.35); }
     html, body {height: 100%;}
@@ -113,8 +113,8 @@
 
   <script>
     // ================= CONFIG =================
-    const SCHOOL_NAME = 'Colegio Guido Spano';
-    const BASE_WEBSITE = 'www.colegioguidospano.edu.ar';
+    const SCHOOL_NAME = 'Nuevo Guido Spano';
+    const BASE_WEBSITE = 'www.nuevoguidospano.edu.ar';
 
     // Cambiá esta URL base por la de TU GitHub Pages.
     // Ejemplo: 'https://tu-usuario.github.io/comunicaciones-gs/'
@@ -127,7 +127,7 @@
       primario:  { header: 'header_primario.png',  footer: 'footer_primaria.png' },
       secundario:{ header: 'header_secundaria.png', footer: 'footer_secu.png' },
       superior:  { header: 'header_sup.png',       footer: 'footer_sup.png' },
-      logos:     { main: 'logo.jpg', firma: 'logo.jpg' }
+      logos:     { main: 'logo.jpg', }
     };
 
     // Colores de fallback si falta alguna imagen
@@ -179,7 +179,7 @@
     function buildEmailHTML({nivel, asunto, titulo, cuerpo, despedida, firmaNombre, firmaCargo, firmaContacto}){
       const L = LEVELS[nivel] || LEVELS.primario;
       const imgs = IMAGES[nivel] || IMAGES.primario;
-      const heading = sanitize(titulo || 'Comunicación institucional');
+      const heading = sanitize(titulo || '');
 
       return `
 <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f4f6f8; padding:24px 0;">
