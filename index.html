@@ -132,14 +132,14 @@
     // ================== CONFIG ==================
     const SCHOOL_NAME = 'Nuevo Guido Spano';
     const BASE_WEBSITE = 'www.nuevoguidospano.edu.ar';
-    const ASSETS = 'https://raw.githubusercontent.com/sebastiangiampani-create/creadormail/main/';
+    const ASSETS = new URL('.', document.baseURI).href;
 
     const IMAGES = {
       inicial:   { header: 'header_inicial.png',   footer: 'footer_inicial.png' },
       primario:  { header: 'header_primario.png',  footer: 'footer_primaria.png' },
       secundario:{ header: 'header_secundaria.png', footer: 'footer_secu.png' },
       superior:  { header: 'header_sup.png',       footer: 'footer_sup.png' },
-      institucional: { header: 'header%20_institucional.png', footer: 'footer_institucional.png' },
+      institucional: { header: 'header_institucional.png', footer: 'footer_institucional.png' },
       logos:     { main: 'logo.jpg' }
     };
 
