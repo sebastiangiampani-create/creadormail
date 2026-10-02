@@ -19,6 +19,18 @@
     input:focus, select:focus, textarea:focus {border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring);}    
     textarea {min-height: 180px; resize: vertical;}
     .muted {color: var(--muted); font-size: 12px}
+    .editor-shell {border:1px solid #233046; border-radius:12px; overflow:hidden; background:#0b1220; transition:.15s ease;}
+    .editor-shell:focus-within {border-color:var(--accent); box-shadow:0 0 0 4px var(--ring);}
+    .editor-toolbar {display:flex; flex-wrap:wrap; gap:6px; padding:8px; border-bottom:1px solid #233046; background:#111827; align-items:center;}
+    .editor-toolbar button, .editor-toolbar select {width:auto; min-width:36px; min-height:34px; padding:6px 9px; border-radius:8px; background:#1f2937; color:#e5e7eb; border:1px solid #334155; font-weight:700;}
+    .editor-toolbar button:hover {background:#273449;}
+    .editor-toolbar .separator {width:1px; height:24px; background:#334155; margin:0 2px;}
+    .rich-editor {min-height:230px; padding:14px; outline:none; color:var(--text); font-family:Arial,Helvetica,sans-serif; font-size:15px; line-height:1.55; overflow:auto;}
+    .rich-editor.signature {min-height:90px;}
+    .rich-editor:empty:before {content:attr(data-placeholder); color:#64748b; pointer-events:none;}
+    .rich-editor p {margin:0 0 10px;}
+    .rich-editor img {display:block; max-width:100%; height:auto; margin:12px auto; border-radius:6px;}
+    .editor-hint {font-size:11px; color:var(--muted); margin-top:6px; line-height:1.4;}
     .actions {display:flex; gap: 10px; flex-wrap: wrap;}
     button {appearance: none; border: 0; border-radius: 12px; background: var(--accent); color: #07130a; font-weight: 700; padding: 12px 16px; cursor: pointer;}
     button.secondary {background: #1f2937; color: #cbd5e1; border: 1px solid #2a3a54;}
@@ -53,10 +65,50 @@
           <input id="asunto" placeholder="Ej: Reunión informativa" />
 
           <label for="cuerpo">Cuerpo</label>
-          <textarea id="cuerpo" placeholder="Escribí el texto aquí..."></textarea>
+          <div class="editor-shell">
+            <div class="editor-toolbar" data-editor="cuerpo">
+              <select data-cmd="formatBlock" title="Estilo de texto">
+                <option value="p">Normal</option>
+                <option value="h2">Título</option>
+                <option value="h3">Subtítulo</option>
+              </select>
+              <button type="button" data-cmd="bold" title="Negrita"><strong>B</strong></button>
+              <button type="button" data-cmd="italic" title="Cursiva"><em>I</em></button>
+              <button type="button" data-cmd="underline" title="Subrayado"><u>U</u></button>
+              <div class="separator"></div>
+              <button type="button" data-cmd="insertUnorderedList" title="Lista con viñetas">• Lista</button>
+              <button type="button" data-cmd="insertOrderedList" title="Lista numerada">1. Lista</button>
+              <div class="separator"></div>
+              <button type="button" data-cmd="justifyLeft" title="Alinear a la izquierda">←</button>
+              <button type="button" data-cmd="justifyCenter" title="Centrar">↔</button>
+              <button type="button" data-cmd="justifyRight" title="Alinear a la derecha">→</button>
+              <div class="separator"></div>
+              <button type="button" data-action="link" title="Insertar enlace">🔗</button>
+              <button type="button" data-action="image" title="Insertar imagen">🖼 Imagen</button>
+              <button type="button" data-cmd="removeFormat" title="Quitar formato">Tx</button>
+              <button type="button" data-cmd="undo" title="Deshacer">↶</button>
+              <button type="button" data-cmd="redo" title="Rehacer">↷</button>
+              <input type="file" accept="image/*" data-image-input hidden />
+            </div>
+            <div id="cuerpo" class="rich-editor" contenteditable="true" data-placeholder="Escribí el texto aquí..."></div>
+          </div>
+          <div class="editor-hint">Podés pegar texto con formato, arrastrar o pegar imágenes, o usar el botón “Imagen”.</div>
 
           <label for="firmaNombre">Firma</label>
-          <input id="firmaNombre" placeholder="Nombre y Apellido" />
+          <div class="editor-shell">
+            <div class="editor-toolbar" data-editor="firmaNombre">
+              <button type="button" data-cmd="bold" title="Negrita"><strong>B</strong></button>
+              <button type="button" data-cmd="italic" title="Cursiva"><em>I</em></button>
+              <button type="button" data-cmd="underline" title="Subrayado"><u>U</u></button>
+              <button type="button" data-cmd="justifyLeft" title="Izquierda">←</button>
+              <button type="button" data-cmd="justifyCenter" title="Centrar">↔</button>
+              <button type="button" data-action="link" title="Insertar enlace">🔗</button>
+              <button type="button" data-action="image" title="Insertar imagen">🖼 Imagen</button>
+              <button type="button" data-cmd="removeFormat" title="Quitar formato">Tx</button>
+              <input type="file" accept="image/*" data-image-input hidden />
+            </div>
+            <div id="firmaNombre" class="rich-editor signature" contenteditable="true" data-placeholder="Nombre, cargo, datos de contacto, firma o logo..."></div>
+          </div>
 
           <div class="actions">
             <button id="btn-generar">Generar vista previa</button>
@@ -149,17 +201,39 @@
       });
     }
 
+    function cleanRichHTML(html){
+      const box = document.createElement('div');
+      box.innerHTML = html || '';
+      box.querySelectorAll('script,style,iframe,object,embed,form,input,button').forEach(n => n.remove());
+      box.querySelectorAll('*').forEach(el => {
+        [...el.attributes].forEach(a => {
+          if(/^on/i.test(a.name)) el.removeAttribute(a.name);
+        });
+      });
+      box.querySelectorAll('img').forEach(img => {
+        img.style.maxWidth = '100%';
+        img.style.height = 'auto';
+        img.style.display = 'block';
+        img.style.margin = img.style.margin || '12px auto';
+        img.removeAttribute('width');
+        img.removeAttribute('height');
+      });
+      return box.innerHTML;
+    }
+
     function buildEmailHTML({nivel, cuerpo, firmaNombre}){
       const L = LEVELS[nivel] || LEVELS.primario;
       const imgs = IMAGES[nivel] || IMAGES.primario;
+      const cuerpoHTML = cleanRichHTML(cuerpo);
+      const firmaHTML = cleanRichHTML(firmaNombre);
       return `
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;padding:24px 0;">
   <tr><td align="center">
     <table role="presentation" width="680" cellpadding="0" cellspacing="0" style="max-width:680px;background:#fff;border:1px solid #e5e7eb;">
       ${imgRow(imgs.header, 'Header ' + L.name, 'header')}
-      <tr><td style="padding:20px 24px;font-family:Arial,Helvetica,sans-serif; color:#111827; font-size:14px;">
-        ${paragraphsFrom(cuerpo)}
-        ${firmaNombre ? `<p style="margin-top:12px;font-weight:700;">${sanitize(firmaNombre)}</p>` : ''}
+      <tr><td style="padding:20px 24px;font-family:Arial,Helvetica,sans-serif; color:#111827; font-size:14px; line-height:1.6;">
+        <div style="font-family:Arial,Helvetica,sans-serif;color:#111827;font-size:14px;line-height:1.6;">${cuerpoHTML}</div>
+        ${firmaHTML ? `<div style="margin-top:18px;font-family:Arial,Helvetica,sans-serif;color:#111827;font-size:14px;line-height:1.5;">${firmaHTML}</div>` : ''}
       </td></tr>
       ${imgRow(imgs.footer, 'Footer ' + L.name, 'footer')}
     </table>
@@ -183,8 +257,8 @@
       return {
         nivel: els.nivel.value,
         asunto: (els.asunto.value||'').trim(),
-        cuerpo: els.cuerpo.value,
-        firmaNombre: els.firmaNombre.value,
+        cuerpo: els.cuerpo.innerHTML,
+        firmaNombre: els.firmaNombre.innerHTML,
       };
     }
 
@@ -221,6 +295,89 @@
       } catch (e) { console.error(e); return false; }
     }
 
+    function insertHTMLAtCursor(html){
+      const sel = window.getSelection();
+      if(!sel || !sel.rangeCount) return;
+      const range = sel.getRangeAt(0);
+      range.deleteContents();
+      const frag = range.createContextualFragment(html);
+      const last = frag.lastChild;
+      range.insertNode(frag);
+      if(last){
+        range.setStartAfter(last);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }
+
+    function insertImageFile(editor, file){
+      if(!file || !file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        editor.focus();
+        insertHTMLAtCursor(`<img src="${reader.result}" alt="Imagen adjunta" style="display:block;max-width:100%;height:auto;margin:12px auto;" />`);
+        update();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    document.querySelectorAll('.editor-toolbar').forEach(toolbar => {
+      const editor = document.getElementById(toolbar.dataset.editor);
+      toolbar.addEventListener('mousedown', e => {
+        if(e.target.closest('button')) e.preventDefault();
+      });
+      toolbar.addEventListener('click', e => {
+        const btn = e.target.closest('button');
+        if(!btn) return;
+        editor.focus();
+        const cmd = btn.dataset.cmd;
+        if(cmd){
+          document.execCommand(cmd, false, null);
+          update();
+          return;
+        }
+        if(btn.dataset.action === 'link'){
+          const url = prompt('Pegá la URL del enlace:');
+          if(url) document.execCommand('createLink', false, url);
+          update();
+        }
+        if(btn.dataset.action === 'image'){
+          toolbar.querySelector('[data-image-input]').click();
+        }
+      });
+      toolbar.querySelectorAll('select[data-cmd]').forEach(select => {
+        select.addEventListener('change', () => {
+          editor.focus();
+          document.execCommand(select.dataset.cmd, false, select.value);
+          update();
+        });
+      });
+      const imageInput = toolbar.querySelector('[data-image-input]');
+      imageInput.addEventListener('change', () => {
+        insertImageFile(editor, imageInput.files[0]);
+        imageInput.value = '';
+      });
+
+      editor.addEventListener('paste', e => {
+        const items = [...(e.clipboardData?.items || [])];
+        const imgItem = items.find(i => i.type.startsWith('image/'));
+        if(imgItem){
+          e.preventDefault();
+          insertImageFile(editor, imgItem.getAsFile());
+        }
+      });
+      editor.addEventListener('drop', e => {
+        const file = [...(e.dataTransfer?.files || [])].find(f => f.type.startsWith('image/'));
+        if(file){
+          e.preventDefault();
+          editor.focus();
+          insertImageFile(editor, file);
+        }
+      });
+      editor.addEventListener('dragover', e => e.preventDefault());
+    });
+
     els.btnGenerar.addEventListener('click', update);
     els.btnCopiarHtml.addEventListener('click', async ()=>{
       const ok = await copyRichHTML(buildEmailHTML(gather()));
@@ -240,10 +397,10 @@
       const tests = [];
       const t1 = imgRow('header_primario.png','h','header');
       tests.push(t1.startsWith('<tr>') && t1.includes('data-role="header"'));
-      const t2 = buildEmailHTML({nivel:'primario', cuerpo:'Linea 1\n\nLinea 2', firmaNombre:'Test'});
-      tests.push(/Footer/.test(t2) && /Header/.test(t2) && /<p/.test(t2));
-      const t3 = paragraphsFrom('a\n\nb');
-      tests.push((t3.match(/<p/g)||[]).length === 2);
+      const t2 = buildEmailHTML({nivel:'primario', cuerpo:'<p>Linea 1</p><p>Linea 2</p>', firmaNombre:'<strong>Test</strong>'});
+      tests.push(/Footer/.test(t2) && /Header/.test(t2) && /<p>Linea 1<\/p>/.test(t2));
+      const t3 = cleanRichHTML('<p><strong>a</strong></p><script>alert(1)</script>');
+      tests.push(/<strong>a<\/strong>/.test(t3) && !/<script/i.test(t3));
       const allPass = tests.every(Boolean);
       if(!allPass){ console.error('Self-tests failed', {tests}); }
     })();
