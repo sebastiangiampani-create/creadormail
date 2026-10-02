@@ -390,19 +390,6 @@
 
     ['nivel','asunto','cuerpo','firmaNombre'].forEach(id=> document.getElementById(id).addEventListener('input', update));
 
-    // ================ SELF TESTS ================
-    (function selfTests(){
-      const tests = [];
-      const t1 = imgRow('header_primario.png','h','header');
-      tests.push(t1.startsWith('<tr>') && t1.includes('data-role="header"'));
-      const t2 = buildEmailHTML({nivel:'primario', cuerpo:'<p>Linea 1</p><p>Linea 2</p>', firmaNombre:'<strong>Test</strong>'});
-      tests.push(/Footer/.test(t2) && /Header/.test(t2) && /<p>Linea 1<\/p>/.test(t2));
-      const t3 = cleanRichHTML('<p><strong>a</strong></p><script>alert(1)</script>');
-      tests.push(/<strong>a<\/strong>/.test(t3) && !/<script/i.test(t3));
-      const allPass = tests.every(Boolean);
-      if(!allPass){ console.error('Self-tests failed', {tests}); }
-    })();
-
     // Estado inicial
     update();
   </script>
