@@ -199,14 +199,36 @@
       padding:16px;
       border-radius:0 0 18px 18px;
       min-height:240px;
+      overflow:hidden;
     }
     .preview{
       background:#fff;
       color:#111;
+      width:100%;
       max-width:680px;
       margin:0 auto;
       border:1px solid #e5e7eb;
       box-shadow:0 8px 24px rgba(107,44,145,.05);
+      overflow:hidden;
+    }
+    /* La maqueta del mail se mantiene en 680px para Gmail,
+       pero dentro de la vista previa se adapta al ancho disponible. */
+    .preview > table,
+    .preview table[role="presentation"]{
+      width:100%!important;
+      max-width:100%!important;
+      table-layout:fixed;
+    }
+    .preview td{
+      max-width:100%!important;
+      overflow-wrap:anywhere;
+      word-break:normal;
+    }
+    .preview img{
+      display:block;
+      width:100%!important;
+      max-width:100%!important;
+      height:auto!important;
     }
     .ngs-footer{
       max-width:1180px;
