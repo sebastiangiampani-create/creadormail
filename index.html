@@ -132,14 +132,14 @@
     // ================== CONFIG ==================
     const SCHOOL_NAME = 'Nuevo Guido Spano';
     const BASE_WEBSITE = 'www.nuevoguidospano.edu.ar';
-    const ASSETS = ''; // usar rutas relativas (archivos en la raíz del repo)
+    const ASSETS = 'https://raw.githubusercontent.com/sebastiangiampani-create/creadormail/main/';
 
     const IMAGES = {
       inicial:   { header: 'header_inicial.png',   footer: 'footer_inicial.png' },
       primario:  { header: 'header_primario.png',  footer: 'footer_primaria.png' },
       secundario:{ header: 'header_secundaria.png', footer: 'footer_secu.png' },
       superior:  { header: 'header_sup.png',       footer: 'footer_sup.png' },
-      institucional: { header: 'header _institucional.png', footer: 'footer_institucional.png' },
+      institucional: { header: 'header%20_institucional.png', footer: 'footer_institucional.png' },
       logos:     { main: 'logo.jpg' }
     };
 
@@ -172,21 +172,19 @@
     }
 
     function fallbackHeaderHTML(L){
-      return `<tr>
-        <td style="padding:20px 24px; background:${L.color}; color:#0b1220; font-family:Arial,Helvetica,sans-serif;">
+      return `
+        <div style="padding:20px 24px; background:${L.color}; color:#0b1220; font-family:Arial,Helvetica,sans-serif;">
           <div style="font-size:11px; letter-spacing:.6px; text-transform:uppercase; opacity:.9; font-weight:700;">${sanitize(L.name)}</div>
           <div style="font-size:18px; font-weight:800; line-height:1.2; margin-top:4px;">${sanitize(SCHOOL_NAME)}</div>
-        </td>
-      </tr>`;
+        </div>`;
     }
 
     function fallbackFooterHTML(L){
-      return `<tr>
-        <td style="padding:12px 24px; background:${L.dark}; color:#ecfeff; font-family:Arial,Helvetica,sans-serif; font-size:12px;">
+      return `
+        <div style="padding:12px 24px; background:${L.dark}; color:#ecfeff; font-family:Arial,Helvetica,sans-serif; font-size:12px;">
           <div style="opacity:.95;">${sanitize(SCHOOL_NAME)} – ${sanitize(L.name)}</div>
           <div style="opacity:.7;">${sanitize(BASE_WEBSITE)}</div>
-        </td>
-      </tr>`;
+        </div>`;
     }
 
     function attachImageFallbacks(container, L){
